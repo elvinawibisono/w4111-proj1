@@ -1,27 +1,58 @@
 <html>
-  <style>
-    body{ 
-      font-size: 15pt;
-      font-family: arial;
-    }
-  </style>
+  <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+    
+    <!-- jquery -->
+      <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>  
+      
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="static/main.css">
+      <style>
+
+      </style>
+  </head>
 
 
 <body>
-  <h1>Some famous Computer Scientists</h1>
-  <div>{{data}}</div>
-
-  <div>
-    {% for n in data %}
-    <div>{{n}}</div>
-    {% endfor %}
+  <div class="container">
+    <div class="row">
+      <nav class="navbar navbar-expand-lg navbar-light" id="navBorder"></nav>
+      <h1 class="title">
+        OWA
+      </h1>
+      <form method="POST" action="/add">
+        <div class="text-center col-md-3"><input type="text" name="name"> <input type="submit" value="Search"></div>
+        </form>
+      
+        <div class="col-md-3 text-center">
+          <a class="navbar-brand" href="/sign-in">Sign in</a>
+        </div>
+        <div class="col-md-2">
+          <img src= "https://cdn-icons-png.flaticon.com/512/263/263142.png" style="height:50px;" href="/shopping-cart">
+        </div>
+      </nav>
   </div>
+    <div>{{data}}</div>
+  
+    <div>
+      {% for n in data %}
+      <div>{{n}}</div>
+      {% endfor %}
+    </div>
+  
+  <p><a href="another">Go to the other page</a></p>
+  
 
-<p><a href="another">Go to the other page</a></p>
+</div>
 
-<form method="POST" action="/add">
-<p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>
-</form>
 
 </body>
 
