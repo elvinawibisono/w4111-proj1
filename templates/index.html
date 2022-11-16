@@ -26,29 +26,37 @@
     <div class="row">
       <nav class="navbar navbar-expand-lg navbar-light" id="navBorder"></nav>
       <h1 class="title">
-        OWA
+        <a href="/">
+          OWA
+        </a>
+        
       </h1>
-      <form method="POST" action="/add">
-        <div class="text-center col-md-3"><input type="text" name="name"> <input type="submit" value="Search"></div>
+      <form method="GET" action="/search_item">
+        <div class="text-center col-md-3">
+          <input type="search" name="wsearch"> <input type="Submit" value="Search"></div>
         </form>
       
         <div class="col-md-3 text-center">
-          <a class="navbar-brand" href="/sign-in">Sign in</a>
+          <a class="navbar-brand" href="/sign.html">Sign in</a>
         </div>
         <div class="col-md-2">
           <img src= "https://cdn-icons-png.flaticon.com/512/263/263142.png" style="height:50px;" href="/shopping-cart">
         </div>
       </nav>
   </div>
-    <div>{{data}}</div>
-  
-    <div>
-      {% for n in data %}
-      <div>{{n}}</div>
-      {% endfor %}
-    </div>
-  
-  <p><a href="another">Go to the other page</a></p>
+
+  <div class="row">
+    {% for n in data %}
+    <div class="col-md-1">
+      <form method="GET" action="/category">
+        <input type="Submit" value="{{n}}" name="categoryName">
+      </form>
+      
+  </div>
+    {% endfor %}
+
+
+  <p><a href="another.html">Go to the other page</a></p>
   
 
 </div>

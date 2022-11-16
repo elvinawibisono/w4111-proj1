@@ -29,7 +29,7 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 #     DATABASEURI = "postgresql://gravano:foobar@34.75.94.195/proj1part2"
 #
-DATABASEURI = "postgresql://user:password@34.75.94.195/proj1part2"
+DATABASEURI = "postgresql://ss6179:855@34.75.94.195/proj1part2"
 
 
 #
@@ -103,17 +103,29 @@ def index():
   """
 
   # DEBUG: this is debugging code to see what request looks like
-  print(request.args)
+  print("request args 106", request.args)
+
 
 
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT name FROM test")
-  names = []
+ 
+  
+  list_categories = []
+  cursor = g.conn.execute("SELECT * FROM Categories")
+  print("cursor line 116", cursor)
+
   for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
+    list_categories.append(result.categoryname)
   cursor.close()
+
+  list_categoryIDs = []
+  secondCursor = g.conn.execute("SELECT categoryid FROM Categories")
+
+  for r in secondCursor:
+    list_categoryIDs.append(r.categoryid)
+  secondCursor.close()
 
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -141,14 +153,18 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
-  context = dict(data = names)
-
+  context = dict(data = list_categories)
+  secondContext = dict(d = list_categoryIDs)
+ 
+  print("index data", context)
 
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context)
+  return render_template("index.html", **context, **secondContext)
+
+
 
 #
 # This is an example of a different path.  You can see it at:
@@ -158,14 +174,98 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
+@app.route('/search_item', methods=['GET', 'POST'])
+def search_item():
+  word = request.args.get("wsearch")
+  print("word line 180", word)
+
+  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c WHERE p.name LIKE (%s) or p.description LIKE (%s) or c.categoryname LIKE (%s)', word, word, word)
+
+  word_dict = {}
+  for result in cursor:
+    word_dict = {'name':result['name'], 'price':result['price'], 'description':result['description'], 'imageURL':result['imageURL']}
+  cursor.close()
+  print("word_dict", word_dict)
+
+  return render_template('search_item.html', word_dict=word_dict)
+
+@app.route('/category', methods=['GET', 'POST'])
+def categories_search():
+  categoryName = request.args.get('categoryName')
+  category = categoryInfo()
+  categoryProducts = categoryProductsInfo()
+  context = dict(cateData = category)
+  print("categories_search line 178")
+  print("categories_search cat", category)
+  print("categoryProducts", categoryProducts)
+
+  return render_template('category.html', category=category, categoryProducts = categoryProducts, **context)
+
+def categoryInfo():
+  categoryName = request.args.get('categoryName')
+  cursor = g.conn.execute('SELECT c.categoryname, c.description FROM Categories c WHERE c.categoryname = (%s)', categoryName)
+
+  categoryInfoData = {}
+
+  for result in cursor:
+    categoryInfoData = {'categoryname':result['categoryname'], 'description':result['description']}
+  cursor.close()
+  
+  return categoryInfoData
+
+def categoryProductsInfo():
+  categoryName = request.args.get('categoryName')
+  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c, In_a c1 WHERE c.categoryname = (%s) and c1.productNumber = p.productNumber and c1.categoryid = c.categoryid', categoryName)
+  categoryProductsInfoData = {}
+
+  for result in cursor:
+    categoryProductsInfoData = {'name':result['name'], 'price':result['price'], 'description':result['description'], 'imageurl':result['imageurl']}
+  cursor.close()
+
+  return categoryProductsInfoData
+
+def businessInfo():
+  name = request.args.get('businessID')
+  cursor = g.conn.execute('SELECT b.businessName, b.socialMedia, o.name, o.school, o.iconImageURL, FROM Business b, Business_owner o, Owns b_o, WHERE b.businessID = (%s) and b.businessID = b_o.businessID and o.email = b_o.email', name)
+
+  businessInfoData = {}
+  for result in cursor:
+    businessInfoData = {'businessName':result['businessName'], 'socialMedia':result['socialMedia'], 'name':result['name'], 'school':result['school'], 'iconImageURL':result['iconImageURL']}
+  cursor.close()
+
+  return businessInfoData
+
+def businessProductsInfo():
+  info = request.args.get('businessID')
+  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageURL FROM Product p, Business b, Produces b_p, WHERE b.businessID = (%s) and b.businessID = b_p.businessID and p.productNumber = b_p.productNumber', info)
+
+  businessProductsInfoData = {}
+  for result in cursor:
+    businessProductsInfoData = {'name':result['name'], 'price':result['price'], 'description':result['description'], 'imageURL':result['imageURL']}
+  cursor.close()
+
+  return businessProductsInfoData
+
 @app.route('/another')
 def another():
   return render_template("another.html")
+
+@app.route('/sign')
+def sign():
+  return render_template("sign.html")
 
 @app.route('/shopping-cart')
 def shopping_cart():
   return render_template("shopping_cart.html")
 
+@app.route('/business/<int:businessID>')
+def business(businessID):
+  query = ''
+  cursor = g.conn.execute(query)
+  businessInformation = []
+  for result in cursor:
+    businessInformation.append(result['Store'], result['Item'], result['Price'])
+  return render_template("business.html")
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
