@@ -297,10 +297,7 @@ def signin():
     name = request.form['name']
     email = request.form['e_mail']
   
-  g.conn.execute('')
-
-
-  return render_template('sign_in.html')
+  return render_template('sign-in.html')
   
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
