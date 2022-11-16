@@ -110,6 +110,7 @@ def index():
   #
   # example of a database query
   #
+
  
   
   list_categories = []
@@ -153,6 +154,7 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
+
   context = dict(data = list_categories)
   secondContext = dict(d = list_categoryIDs)
  
@@ -250,14 +252,26 @@ def businessProductsInfo():
 def another():
   return render_template("another.html")
 
-@app.route('/sign')
-def sign():
-  return render_template("sign.html")
 
-@app.route('/shopping-cart')
+@app.route('/shopping-cart',methods = ['POST'])
+
 def shopping_cart():
+ 
+  productName = request.form['name']
+
   return render_template("shopping_cart.html")
 
+
+@app.route('/products')
+def products():
+  result = g.conn.execute("SELECT * FROM product p")
+  return render_template("product.html", result = result)
+
+@app.route('/sign-up')
+def signup():
+  return render_template("sign_up.html")
+  
+  
 @app.route('/business/<int:businessID>')
 def business(businessID):
   query = ''
@@ -267,12 +281,35 @@ def business(businessID):
     businessInformation.append(result['Store'], result['Item'], result['Price'])
   return render_template("business.html")
 
+
+@app.route('/add-customer',methods = ['POST'])
+def addcustomer(): 
+  name = request.form['name']
+  email = request.form['e_mail']
+  school = request.form['school']
+  imgurl = request.form['img_url']
+  address = request.form['address']
+  g.conn.execute('INSERT INTO Customer ("name", "email", school, address, iconimagurl) VALUES (%s, %s, %s, %s)', name, email, school, address,imgurl)
+  return redirect("index.html")
+
+@app.route('/sign-in', methods =['GET', 'POST'])
+def signin():
+  if request.method =='POST':
+    name = request.form['name']
+    email = request.form['e_mail']
+  
+  g.conn.execute('')
+
+
+  return render_template('sign_in.html')
+  
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
   name = request.form['name']
   g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   return redirect('/')
+
 
 
 @app.route('/login')
