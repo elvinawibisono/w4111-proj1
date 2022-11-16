@@ -258,8 +258,8 @@ def sign():
 def shopping_cart():
   return render_template("shopping_cart.html")
 
-@app.route('/business/<int:businessID>')
-def business(businessID):
+@app.route('/business')
+def business():
   query = ''
   cursor = g.conn.execute(query)
   businessInformation = []
