@@ -200,10 +200,11 @@ def categories_search():
   category = categoryInfo()
   categoryProducts = categoryProductsInfo()
   category_context = dict(data = category)
+  category_products_context = dict(productData = categoryProducts)
   print("categories_search line 178")
   print("categories_search cat", category_context)
 
-  return render_template('category.html', category=category, categoryProducts = categoryProducts, **category_context)
+  return render_template('category.html', category=category, categoryProducts = categoryProducts, **category_context, **category_products_context)
 
 def categoryInfo():
   categoryName = request.args.get('categoryName')
