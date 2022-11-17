@@ -178,21 +178,23 @@ def index():
 #
 @app.route('/search_item', methods=['GET', 'POST'])
 def search_item():
-  word = request.args.get("wsearch")
+  word = "%"
+  word += request.args.get("wsearch")
+  word += "%"
   print("word line 180", word)
 
-  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c WHERE p.name LIKE %s or p.description LIKE %s or c.categoryname LIKE %s', word, word, word)
+  cursor = g.conn.execute('SELECT DISTINCT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c WHERE p.name LIKE %s or p.description LIKE %s or c.categoryname LIKE %s', word, word, word)
 
   word_dict = {}
   for result in cursor:
-    word_dict.append(result)
-  cursor.close()
+    word_dict.update(result)
+  
   context = dict(data = word_dict)
   print("word_dict", word_dict)
   print("word 192", word)
   
 
-  return render_template('search_item.html', word_dict=word_dict, **context)
+  return render_template('search_item.html', word_dict=word_dict, **context, cursor=cursor)
 
 @app.route('/category', methods=['GET', 'POST'])
 def categories_search():
@@ -202,7 +204,7 @@ def categories_search():
   category_context = dict(data = category)
   category_products_context = dict(productData = categoryProducts)
   print("categories_search line 178")
-  print("categories_search cat", category_context)
+  print("categories_search cat", category_products_context)
 
   return render_template('category.html', category=category, categoryProducts = categoryProducts, **category_context, **category_products_context)
 
@@ -221,7 +223,7 @@ def categoryInfo():
 
 def categoryProductsInfo():
   categoryName = request.args.get('categoryName')
-  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c, In_a c1 WHERE c.categoryname = (%s) and c1.productNumber = p.productNumber and c1.categoryid = c.categoryid', categoryName)
+  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c, In_a c1 WHERE c.categoryname = (%s) and c1.productNumber = p.productNumber and c1.categoryid = c.categoryid;', categoryName)
   categoryProductsInfoData = {}
 
   for result in cursor:
