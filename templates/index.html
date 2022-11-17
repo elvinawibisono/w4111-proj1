@@ -14,7 +14,7 @@
       <!-- Bootstrap CSS -->
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
     
-      <link rel="stylesheet" href="static/main.css">
+
       <style>
 
       </style>
@@ -22,6 +22,8 @@
 
 
 <body>
+
+  
   <div class="container">
     <div class="row">
       <nav class="navbar navbar-expand-lg navbar-light" id="navBorder"></nav>
@@ -47,19 +49,16 @@
 
   <div class="row">
     {% for n in data %}
-    <div class="col-md-1">
+    <div class="col-md-2">
       <form method="GET" action="/category">
-        <input type="Submit" value="{{n}}" name="categoryName">
+        <input type="Submit" value="{{n}}" name="categoryName" class="btn btn-info">
       </form>
       
   </div>
     {% endfor %}
 
-
-  <p><a href="another.html">Go to the other page</a></p>
-  
-
 </div>
+
 
 
 </body>

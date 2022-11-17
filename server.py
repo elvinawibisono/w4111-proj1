@@ -181,27 +181,29 @@ def search_item():
   word = request.args.get("wsearch")
   print("word line 180", word)
 
-  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c WHERE p.name LIKE (%s) or p.description LIKE (%s) or c.categoryname LIKE (%s)', word, word, word)
+  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c WHERE p.name LIKE %s or p.description LIKE %s or c.categoryname LIKE %s', word, word, word)
 
   word_dict = {}
   for result in cursor:
-    word_dict = {'name':result['name'], 'price':result['price'], 'description':result['description'], 'imageURL':result['imageURL']}
+    word_dict.append(result)
   cursor.close()
+  context = dict(data = word_dict)
   print("word_dict", word_dict)
+  print("word 192", word)
+  
 
-  return render_template('search_item.html', word_dict=word_dict)
+  return render_template('search_item.html', word_dict=word_dict, **context)
 
 @app.route('/category', methods=['GET', 'POST'])
 def categories_search():
   categoryName = request.args.get('categoryName')
   category = categoryInfo()
   categoryProducts = categoryProductsInfo()
-  context = dict(cateData = category)
+  category_context = dict(data = category)
   print("categories_search line 178")
-  print("categories_search cat", category)
-  print("categoryProducts", categoryProducts)
+  print("categories_search cat", category_context)
 
-  return render_template('category.html', category=category, categoryProducts = categoryProducts, **context)
+  return render_template('category.html', category=category, categoryProducts = categoryProducts, **category_context)
 
 def categoryInfo():
   categoryName = request.args.get('categoryName')
@@ -211,6 +213,7 @@ def categoryInfo():
 
   for result in cursor:
     categoryInfoData = {'categoryname':result['categoryname'], 'description':result['description']}
+    #categoryInfoData.append(result)
   cursor.close()
   
   return categoryInfoData
