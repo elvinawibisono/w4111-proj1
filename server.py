@@ -12,10 +12,11 @@ import os
   # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response
+from flask import Flask, flash, request, render_template, g, redirect, Response
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 #
@@ -183,15 +184,25 @@ def search_item():
   word += "%"
   print("word line 180", word)
 
-  cursor = g.conn.execute('SELECT DISTINCT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c WHERE p.name LIKE %s or p.description LIKE %s or c.categoryname LIKE %s', word, word, word)
+  if len(word) == 2:
+    flash('Please enter a value!')
+    return render_template('index.html')
+
+  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl, c.categoryname FROM Product p, Categories c WHERE p.name ILIKE %s or p.description ILIKE %s or c.categoryname ILIKE %s', word, word, word)
 
   word_dict = {}
   for result in cursor:
     word_dict.update(result)
   
+  if len(word_dict) == 0:
+    flash('No products found')
+    return render_template('index.html')
+
+  
   context = dict(data = word_dict)
   print("word_dict", word_dict)
   print("word 192", word)
+  print("len of word_dict", len(word_dict))
   
 
   return render_template('search_item.html', word_dict=word_dict, **context, cursor=cursor)
