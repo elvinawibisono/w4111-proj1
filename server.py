@@ -206,7 +206,9 @@ def categories_search():
   print("categories_search line 178")
   print("categories_search cat", category_products_context)
 
-  return render_template('category.html', category=category, categoryProducts = categoryProducts, **category_context, **category_products_context)
+  result = g.conn.execute("SELECT * FROM Product p, Categories c, In_a c1 WHERE c.categoryname = (%s) and c1.productnumber = p.productnumber and c1.categoryid = c.categoryid;", categoryName)
+
+  return render_template('category.html', category=category, categoryProducts = categoryProducts, **category_context, **category_products_context, result=result)
 
 def categoryInfo():
   categoryName = request.args.get('categoryName')
@@ -223,12 +225,14 @@ def categoryInfo():
 
 def categoryProductsInfo():
   categoryName = request.args.get('categoryName')
-  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c, In_a c1 WHERE c.categoryname = (%s) and c1.productNumber = p.productNumber and c1.categoryid = c.categoryid;', categoryName)
+  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl FROM Product p, Categories c, In_a c1 WHERE c.categoryname = (%s) and c1.productnumber = p.productnumber and c1.categoryid = c.categoryid;', categoryName)
   categoryProductsInfoData = {}
 
   for result in cursor:
     categoryProductsInfoData = {'name':result['name'], 'price':result['price'], 'description':result['description'], 'imageurl':result['imageurl']}
   cursor.close()
+  print("result cate prod info", result)
+  print("cat prod info", categoryProductsInfoData)
 
   return categoryProductsInfoData
 

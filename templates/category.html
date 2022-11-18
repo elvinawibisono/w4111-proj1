@@ -59,29 +59,42 @@
             <h5>{{data['description']}}</h4>
         </div>
         
+        {% for r in result %}
+       
         <div class="row">
             <div class="col-md-3">
                 <h7>
-                    <img class="img-format" src= "{{productData['imageurl']}}">
+                    {% if r.imageurl is not none %}
+                    <img class="img-format" src= "{{r.imageurl}}">
+                    {% else %}
+                        NONE
+                    {% endif %}
                 </h7>
             </div>
             <div class="col-md-3">
                 <h7>
-                    {{productData['name']}} 
+                    {{r.name}}
                 </h7>
             </div>
             <div class="col-md-3">
                 <h7>
-                    {{productData['description']}} 
+                    {{r[3]}} 
                 </h7>
             </div>
             <div class="col-md-3">
                 <h7>
-                    ${{productData['price']}} 
+                    {{r.price}} 
                 </h7>
             </div>
             
         </div>
+        {% endfor %}
+
+            
+                
+            
+
+        
 </div>
 
     
