@@ -200,9 +200,7 @@ def search_item():
 
   
   context = dict(data = word_dict)
-  print("word_dict", word_dict)
-  print("word 192", word)
-  print("len of word_dict", len(word_dict))
+
   
 
   return render_template('search_item.html', word_dict=word_dict, **context, cursor=cursor)
@@ -214,10 +212,9 @@ def categories_search():
   categoryProducts = categoryProductsInfo()
   category_context = dict(data = category)
   category_products_context = dict(productData = categoryProducts)
-  print("categories_search line 178")
-  print("categories_search cat", category_products_context)
 
-  result = g.conn.execute("SELECT * FROM Product p, Categories c, In_a c1 WHERE c.categoryname = (%s) and c1.productnumber = p.productnumber and c1.categoryid = c.categoryid;", categoryName)
+
+  result = g.conn.execute("SELECT * FROM Product p, Categories c, In_a c1, Business b, Produces b_p WHERE c.categoryname = (%s) and c1.productnumber = p.productnumber and c1.categoryid = c.categoryid and b_p.productnumber = p.productnumber and b.businessid = b_p.businessid;", categoryName)
 
   return render_template('category.html', category=category, categoryProducts = categoryProducts, **category_context, **category_products_context, result=result)
 
@@ -242,32 +239,27 @@ def categoryProductsInfo():
   for result in cursor:
     categoryProductsInfoData = {'name':result['name'], 'price':result['price'], 'description':result['description'], 'imageurl':result['imageurl']}
   cursor.close()
-  print("result cate prod info", result)
-  print("cat prod info", categoryProductsInfoData)
 
   return categoryProductsInfoData
 
+@app.route('/business')
+def business():
+  bInfo = businessInfo()
+  busData = businessInfoProducts()
+
+  return render_template('business.html', bInfo=bInfo, busData=busData)
+
 def businessInfo():
-  name = request.args.get('businessID')
-  cursor = g.conn.execute('SELECT b.businessName, b.socialMedia, o.name, o.school, o.iconImageURL, FROM Business b, Business_owner o, Owns b_o, WHERE b.businessID = (%s) and b.businessID = b_o.businessID and o.email = b_o.email', name)
+  businessName = request.args.get('businessName')
+  bInfo = g.conn.execute('SELECT * FROM Business b, Business_owner b_o, Owns o WHERE b.businessname = (%s) and b.businessid = o.businessid and o.email = b_o.email', businessName)
 
-  businessInfoData = {}
-  for result in cursor:
-    businessInfoData = {'businessName':result['businessName'], 'socialMedia':result['socialMedia'], 'name':result['name'], 'school':result['school'], 'iconImageURL':result['iconImageURL']}
-  cursor.close()
+  return bInfo
 
-  return businessInfoData
+def businessInfoProducts():
+  businessName = request.args.get('businessName')
+  businessData = g.conn.execute('SELECT * FROM Business b, Product p, Produces b_p WHERE b.businessname = (%s) and b.businessid = b_p.businessid and p.productnumber = b_p.productnumber', businessName)
 
-def businessProductsInfo():
-  info = request.args.get('businessID')
-  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageURL FROM Product p, Business b, Produces b_p, WHERE b.businessID = (%s) and b.businessID = b_p.businessID and p.productNumber = b_p.productNumber', info)
-
-  businessProductsInfoData = {}
-  for result in cursor:
-    businessProductsInfoData = {'name':result['name'], 'price':result['price'], 'description':result['description'], 'imageURL':result['imageURL']}
-  cursor.close()
-
-  return businessProductsInfoData
+  return businessData
 
 @app.route('/another')
 def another():
@@ -290,16 +282,6 @@ def products():
 @app.route('/sign-up')
 def signup():
   return render_template("sign_up.html")
-  
-  
-@app.route('/business/<int:businessID>')
-def business(businessID):
-  query = ''
-  cursor = g.conn.execute(query)
-  businessInformation = []
-  for result in cursor:
-    businessInformation.append(result['Store'], result['Item'], result['Price'])
-  return render_template("business.html")
 
 
 @app.route('/add-customer',methods = ['POST'])

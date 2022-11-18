@@ -17,7 +17,9 @@
 
       <style>
         .img-format{
-            height:200px;
+            
+            width:200px;
+            padding:10px;
         }       
       </style>
   </head>
@@ -75,6 +77,11 @@
                 <h6>
                     {{r.name}}
                 </h6>
+                <div class="row">
+                    <form method="GET" action="/business">
+                        <input type="Submit" value="{{r.businessname}}" name="businessName" class="btn btn-info">
+                      </form>
+                </div>
             </div>
             <div class="col-md-3">
                 <h8>
