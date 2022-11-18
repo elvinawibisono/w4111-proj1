@@ -1,4 +1,3 @@
-
 """
 Columbia's COMS W4111.001 Introduction to Databases
 Example Webserver
@@ -12,7 +11,7 @@ import os
   # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, flash, request, render_template, g, redirect, Response
+from flask import Flask, flash, session, request, redirect, render_template, g, redirect, Response
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -296,12 +295,47 @@ def addcustomer():
 
 @app.route('/sign-in', methods =['GET', 'POST'])
 def signin():
+  session.pop('_flashes', None)
   if request.method =='POST':
-    name = request.form['name']
-    email = request.form['e_mail']
+    name = request.form["name"]
+    email = request.form["email"]
+
+    session["name"] = name
+    session["email"] = email
+
+    customerInfo = g.conn.execute('SELECT * FROM Customer c WHERE c.name = (%s) and c.email = (%s)', name, email)
+    businessInfo = g.conn.execute('SELECT * FROM Business_owner b WHERE b.name = (%s) and b.email = (%s)', name, email)
+
+    customerAccounts = []
+    for c in customerInfo:
+      customerAccounts.append(c)
+    customerInfo.close()
+
+    businessAccounts = []
+    for b in businessInfo:
+      businessAccounts.append(b)
+    businessInfo.close()
+
+    if (len(customerAccounts) == 0 and len(businessAccounts) == 0):
+      flash("Incorrect name or email!")
+      return render_template('sign-in.html')
+
+    return redirect('/')
   
   return render_template('sign-in.html')
-  
+
+@app.route('/logout')
+def logout():
+  if (session["name"]) == None:
+    flash("Currently not logged in!")
+    return render_template('index.html')
+  else:
+    session["name"] = None
+    session["email"] = None
+    flash("Logged out successfully!")
+    
+  return render_template('sign-in.html')
+
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
