@@ -16,7 +16,10 @@
     
 
       <style>
-
+        .img-format{
+            width:200px;
+            padding:10px;
+        }   
       </style>
   </head>
 
@@ -42,43 +45,51 @@
       </div>
         <div class="col-md-3 text-center">
           <a class="navbar-brand" href="/sign-in">Sign in</a>
-          <a class="navbar-brand" href="/logout">Logout</a>
         </div>
         <div class="col-md-2">
           <img src= "https://cdn-icons-png.flaticon.com/512/263/263142.png" style="height:50px;" href="/shopping_cart.html">
         </div>
-            
       </nav>
   </div>
+  <div class="container">
+    {% for b in bInfo %}
+        <div class="row">
+            <div class="col-md-3">
+                <img class="img-format" src= "{{b.iconimageurl}}">
+            </div>
+            <div class="col-md-2">
+                <h5>
+                    <div class="row">
+                        {{b.businessname}}
+                    </div>
+                </h5>
+                <div class="row">
+                    {{b.name}} @ {{b.school}}
+                </div>
+                <div class="row">
 
-  <div class="row">
-    {% for n in data %}
-    <div class="col-md-2">
-      <form method="GET" action="/category">
-        <input type="Submit" value="{{n}}" name="categoryName" class="btn btn-info">
-      </form>
-      
+                    {{b.socialmedia}}
+                </div>
+            </div>
+
+        </div>
+    {% endfor %}
   </div>
-    {% endfor %}
-    <a role="button" type="button" class="btn btn-info" value="Show" href="/products">
-      Show all products!
-    </a>
-
-    {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      {{ message }}
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
-</div>
-
-
-
-</body>
-
-
-</html>
+  <div class="container">
+    <div class="row">
+        {% for p in busData %}
+        <div class="col-md-3">
+            <img class="img-format" src= "{{p.imageurl}}">
+        </div>
+        <div class="col-md-3">
+            {{p.name}}
+        </div>
+        <div class="col-md-3">
+            {{p.description}}
+        </div>
+        <div class="col-md-3">
+            {{p.price}}
+        </div>
+        {% endfor %}
+    </div>
+  </div>
