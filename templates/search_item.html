@@ -1,7 +1,86 @@
-{% extends "index.html" %} {% block content %}
-{% for n in word_dict %}
-    <div>
-        hello
+<html>
+  <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+    
+    <!-- jquery -->
+      <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>  
+      
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    
+
+      <style>
+        .img-format{
+            width:200px;
+            padding:10px;
+        }   
+      </style>
+  </head>
+
+
+<body>
+
+  
+  <div class="container">
+    <div class="row">
+      <nav class="navbar navbar-expand-lg navbar-light" id="navBorder"></nav>
+      <h1 class="title">
+        <a href="/">
+          OWA
+        </a>
+        
+      </h1>
+      <div class="col-md-3">
+      <form method="GET" action="/search_item" class="form">
+        <div class="text-center col-md-3">
+          <input type="search" name="wsearch"> <input type="Submit" value="Search"  class="btn btn-info"></div>
+        </form>
+      </div>
+        <div class="col-md-3 text-center">
+          <a class="navbar-brand" href="/sign-in">Sign in</a>
+        </div>
+        <div class="col-md-2">
+          <img src= "https://cdn-icons-png.flaticon.com/512/263/263142.png" style="height:50px;" href="/shopping-cart">
+        </div>
+      </nav>
+  </div>
+
+  <div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <img src = "{{data['imageurl']}}" class="img-format">
+        </div>
+        <div class="col-md-2">
+            <h6>
+                {{data['name']}}
+            </h6>
+        </div>
+        <div class="col-md-2">
+            {{data['description']}}
+        </div>
+        <div class="col-md-2">
+            ${{data['price']}}
+        </div>
+        <!--add-to-cart-->
+        <div class="col-md-2">
+          <h6>
+            <form method = "GET" action = "/add-to-cart">
+              <input type = "hidden" name = "code" value = "{{data['productnumber']}}"/>
+              <input type = "hidden" name = "price" value = "{{data['price']}}"/>
+              <input type = "hidden" name = "name" value = "{{data['name']}}"/>
+              <input type = "number" class="product-quantity" name="quantity" min = 1 max = "{{data['quantity']}}" size="2" />
+              <input type = "submit" value = "Add to Cart" name ="productNumber" class = "btn btn-lg btn-primary btn-block"/>
+    
+            </form>
+          </h6>
+      </div>
+
     </div>
-{% endfor %}
-{% endblock %}
+
+  </div>
