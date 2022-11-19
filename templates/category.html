@@ -90,11 +90,26 @@
             </div>
             <div class="col-md-3">
                 <h7>
-                    {{r.price}} 
+                    ${{r.price}} 
                 </h7>
             </div>
-            
+
+          <!---add to cart -->
+          <div class="col-md-3">
+            <h6>
+              <form method = "GET" action = "/add-to-cart">
+                <input type = "hidden" name = "code" value = "{{r.productnumber}}"/>
+                <input type = "hidden" name = "price" value = "{{r.price}}"/>
+                <input type = "hidden" name = "name" value = "{{r.name}}"/>
+                <input type = "number" class="product-quantity" name="quantity" min = 1 max = "{{r.quantity}}" size="2" />
+                <input type = "submit" value = "Add to Cart" name ="productNumber" class = "btn btn-lg btn-primary btn-block"/>
+      
+              </form>
+            </h6>
         </div>
+            
+      </div>
+
         {% endfor %}
 
             
