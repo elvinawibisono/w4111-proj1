@@ -1,4 +1,3 @@
-
 """
 Columbia's COMS W4111.001 Introduction to Databases
 Example Webserver
@@ -15,7 +14,7 @@ from datetime import date
   # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, flash, request, render_template, g, redirect, Response
+from flask import Flask, flash, session, request, redirect, render_template, g, redirect, Response
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -161,14 +160,17 @@ def index():
 
   context = dict(data = list_categories)
   secondContext = dict(d = list_categoryIDs)
- 
+  
+  name = session.get('name')
+
+
   print("index data", context)
 
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context, **secondContext)
+  return render_template("index.html", **context, **secondContext, name=name)
 
 
 
@@ -245,6 +247,23 @@ def categoryProductsInfo():
 
   return categoryProductsInfoData
 
+@app.route('/account')
+def account():
+  name = request.args.get('name')
+  accountInfo = g.conn.execute('SELECT * FROM Business_owner b, Customer c WHERE b.name = (%s) or c.name = (%s)', name, name)
+
+  account_dict = {}
+  for result in accountInfo:
+    account_dict.update(result)
+  
+  if len(account_dict) == 0:
+    flash('No logged in session found')
+    return render_template('index.html')
+
+  context = dict(accountData = account_dict)
+  
+  return render_template('account.html', accountInfo=accountInfo, **context)
+
 @app.route('/business')
 def business():
   bInfo = businessInfo()
@@ -257,12 +276,30 @@ def businessInfo():
   bInfo = g.conn.execute('SELECT * FROM Business b, Business_owner b_o, Owns o WHERE b.businessname = (%s) and b.businessid = o.businessid and o.email = b_o.email', businessName)
 
   return bInfo
-
+  
 def businessInfoProducts():
   businessName = request.args.get('businessName')
   businessData = g.conn.execute('SELECT * FROM Business b, Product p, Produces b_p WHERE b.businessname = (%s) and b.businessid = b_p.businessid and p.productnumber = b_p.productnumber', businessName)
 
   return businessData
+
+def businessOwnerInfo():
+  name = request.args.get('name')
+  ownerData = g.conn.execute('SELECT * FROM Business_owner b WHERE b.name = (%s)', name)
+
+  return ownerData
+
+def customerInfo():
+  name = request.args.get('name')
+  customerData = g.conn.execute('SELECT * FROM Customer c WHERE c.name = (%s)', name)
+
+  return customerData
+
+def accountInformation():
+  name = request.args.get('name')
+  accountProfile = g.conn.execute('SELECT * FROM Business_owner b, Customer c WHERE c.name = (%s) or b.name = (%s)', name, name)
+
+  return accountProfile
 
 @app.route('/another')
 def another():
@@ -324,27 +361,87 @@ def products():
   return render_template("product.html", result = result)
 
 @app.route('/sign-up')
-def signup():
+def signup(): 
   return render_template("sign_up.html")
 
-@app.route('/add-customer',methods = ['POST'])
-def addcustomer(): 
+
+@app.route('/add-customer', methods = ['GET', 'POST'])
+def addCustomer():
   name = request.form['name']
   email = request.form['e_mail']
   school = request.form['school']
-  imgurl = request.form['img_url']
   address = request.form['address']
-  #g.conn.execute('INSERT INTO Customer ("name", "email", school, address, iconimagurl) VALUES (%s, %s, %s, %s)', name, email, school, address,imgurl)
-  return redirect("index.html")
+  imgurl = request.form['img_url']
 
+  if name is None or email is None or school is None or imgurl is None or address is None:
+    flash("Please fill in all required fields!")
+    return render_template("sign_up.html")
+  
+  emails = allCustomerEmails()
+
+  if email in emails:
+    flash("Email has already been taken!")
+    return render_template("sign_up.html")
+
+  g.conn.execute('INSERT INTO Customer("email", "name", "school", "iconimageurl", "address") VALUES ((%s), (%s), (%s), (%s), (%s));', email, name, school, imgurl, address)
+
+  return render_template("index.html")
+
+
+def allCustomerEmails():
+  profileData = g.conn.execute('SELECT email FROM Customer')
+  profiles = []
+
+  for person in profileData:
+    profiles.append(person)
+  profileData.close()
+  print("all emails", person)
+
+  return profiles
+  
 @app.route('/sign-in', methods =['GET', 'POST'])
 def signin():
+  session.pop('_flashes', None)
   if request.method =='POST':
-    name = request.form['name']
-    email = request.form['e_mail']
+    name = request.form["name"]
+    email = request.form["email"]
+
+    session["name"] = name
+    session["email"] = email
+
+    customerInfo = g.conn.execute('SELECT * FROM Customer c WHERE c.name = (%s) and c.email = (%s)', name, email)
+    businessInfo = g.conn.execute('SELECT * FROM Business_owner b WHERE b.name = (%s) and b.email = (%s)', name, email)
+
+    customerAccounts = []
+    for c in customerInfo:
+      customerAccounts.append(c)
+    customerInfo.close()
+
+    businessAccounts = []
+    for b in businessInfo:
+      businessAccounts.append(b)
+    businessInfo.close()
+
+    if (len(customerAccounts) == 0 and len(businessAccounts) == 0):
+      flash("Incorrect name or email!")
+      return render_template('sign-in.html')
+
+    return redirect('/')
   
   return render_template('sign-in.html')
-  
+
+@app.route('/logout')
+def logout():
+  if (session["name"]) == None:
+    flash("Currently not logged in!")
+    return render_template('index.html')
+  else:
+    session["name"] = None
+    session["email"] = None
+    flash("Logged out successfully!")
+
+  return render_template('sign-in.html')
+
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():

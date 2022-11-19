@@ -1,0 +1,95 @@
+<html>
+  <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+    
+    <!-- jquery -->
+      <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>  
+      
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    
+
+      <style>
+        .img-format{
+            width:200px;
+            padding:10px;
+        }   
+      </style>
+  </head>
+
+
+<body>
+
+  
+  <div class="container">
+    <div class="row">
+      <nav class="navbar navbar-expand-lg navbar-light" id="navBorder"></nav>
+      <h1 class="title">
+        <a href="/">
+          OWA
+        </a>
+        
+      </h1>
+      <div class="col-md-3">
+      <form method="GET" action="/search_item" class="form">
+        <div class="text-center col-md-3">
+          <input type="search" name="wsearch"> <input type="Submit" value="Search"  class="btn btn-info" required="required"></div>
+          
+        </form>
+      </div>
+        <div class="col-md-3 text-center">
+          <a class="navbar-brand" href="/sign-in">Sign in</a>
+        </div>
+        <div class="col-md-2">
+          <img src= "https://cdn-icons-png.flaticon.com/512/263/263142.png" style="height:50px;" href="/shopping_cart.html">
+        </div>
+      </nav>
+  </div>
+  <div class="container">
+    {% for b in bInfo %}
+        <div class="row">
+            <div class="col-md-3">
+                <img class="img-format" src= "{{b.iconimageurl}}">
+            </div>
+            <div class="col-md-2">
+                <h5>
+                    <div class="row">
+                        {{b.businessname}}
+                    </div>
+                </h5>
+                <div class="row">
+                    {{b.name}} @ {{b.school}}
+                </div>
+                <div class="row">
+
+                    {{b.socialmedia}}
+                </div>
+            </div>
+
+        </div>
+    {% endfor %}
+  </div>
+  <div class="container">
+    <div class="row">
+        {% for p in busData %}
+        <div class="col-md-3">
+            <img class="img-format" src= "{{p.imageurl}}">
+        </div>
+        <div class="col-md-3">
+            {{p.name}}
+        </div>
+        <div class="col-md-3">
+            {{p.description}}
+        </div>
+        <div class="col-md-3">
+            {{p.price}}
+        </div>
+        {% endfor %}
+    </div>
+  </div>

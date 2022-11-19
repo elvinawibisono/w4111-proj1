@@ -16,7 +16,10 @@
     
 
       <style>
-
+        .img-format{
+          width:200px;
+          padding:10px;
+        } 
       </style>
   </head>
 
@@ -36,57 +39,28 @@
       <div class="col-md-3">
       <form method="GET" action="/search_item" class="form">
         <div class="text-center col-md-3">
-          <input type="search" name="wsearch"> <input type="Submit" value="Search"  class="btn btn-info" required="required"></div>  
+          <input type="search" name="wsearch"> <input type="Submit" value="Search"  class="btn btn-info" required="required"></div>
+          
         </form>
       </div>
         <div class="col-md-3 text-center">
           <a class="navbar-brand" href="/sign-in">Sign in</a>
           <a class="navbar-brand" href="/logout">Logout</a>
-          
         </div>
         <div class="col-md-2">
-          <img src= "https://cdn-icons-png.flaticon.com/512/263/263142.png" style="height:50px;" href="/shopping-cart">
+          <img src= "https://cdn-icons-png.flaticon.com/512/263/263142.png" style="height:50px;" href="/shopping_cart.html">
         </div>
-        <div class="col-md-2">
-          {% if name is not none %}
-          <form method="GET" action="/account">
-            <input type="Submit" value="{{name}}" name="name" class="btn btn-info">
-          </form>
-          
-          {% endif %}
-          
-      </div>
+            
       </nav>
   </div>
 
-  <div class="row">
-    {% for n in data %}
-    <div class="col-md-2">
-      <form method="GET" action="/category">
-        <input type="Submit" value="{{n}}" name="categoryName" class="btn btn-info">
-      </form>
-      
+  <div class="container">
+    <div class="row">
+        <img class="img-format" src= "{{accountData.iconimageurl}}">
+        <div class="col-md-3">
+            <h5>
+                {{accountData.name}} @ {{accountData.school}}
+            </h5>
+        </div>
+    </div>
   </div>
-    {% endfor %}
-    <a role="button" type="button" class="btn btn-info" value="Show" href="/products">
-      Show all products!
-    </a>
-
-    {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      {{ message }}
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
-</div>
-
-
-
-</body>
-
-
-</html>
