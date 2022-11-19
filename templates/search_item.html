@@ -65,8 +65,22 @@
             {{data['description']}}
         </div>
         <div class="col-md-2">
-            {{data['price']}}
+            ${{data['price']}}
         </div>
+        <!--add-to-cart-->
+        <div class="col-md-2">
+          <h6>
+            <form method = "GET" action = "/add-to-cart">
+              <input type = "hidden" name = "code" value = "{{data['productnumber']}}"/>
+              <input type = "hidden" name = "price" value = "{{data['price']}}"/>
+              <input type = "hidden" name = "name" value = "{{data['name']}}"/>
+              <input type = "number" class="product-quantity" name="quantity" min = 1 max = "{{data['quantity']}}" size="2" />
+              <input type = "submit" value = "Add to Cart" name ="productNumber" class = "btn btn-lg btn-primary btn-block"/>
+    
+            </form>
+          </h6>
+      </div>
+
     </div>
 
   </div>
