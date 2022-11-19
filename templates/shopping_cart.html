@@ -1,1 +1,73 @@
-{% extends "index.html" %} {% block content %}
+<html>
+  <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+    
+    <!-- jquery -->
+      <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>  
+      
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    
+      
+      <style>
+        table {
+
+        border:1px solid black;
+      }
+
+      </style>
+  </head>
+
+
+<body>
+
+  <center><h2>Shopping Cart </h2></center>
+
+
+  <table style="width:75% ;margin-left:auto;margin-right:auto;">
+    <thead>
+    <tr>
+      <th>Product</th>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      
+      
+      
+
+    </tr>
+  </thead>
+
+  <tbody>
+
+    {% for r in result %}
+    <tr>
+      <td><img src = "{{r.imageurl}}" width = "300" height = "300"> </td>  
+      <td>{{r.name}}</td>
+      <td> ${{r.price}}</td>
+
+      
+      {% endfor %}
+
+      <td>{{quantity}}</td>
+
+
+    </tr>
+  
+  
+  <p><a href="another">Go to the other page</a></p>
+  
+
+</div>
+
+
+</body>
+
+
+</html>
