@@ -80,6 +80,7 @@
 
     <center><h2>Products</h2></center>
 
+
     <table style="width:75% ;margin-left:auto;margin-right:auto;">
       <thead>
       <tr>
@@ -95,14 +96,23 @@
 
       {% for r in result %}
       <tr>
-        <td><img src = "{{r.imageurl}}" class="img-format"> </td>  
+
+        <td><img src = "{{r.imageurl}}" width = "300" height = "300"> </td>  
+
         <td>{{r.name}}</td>
-        <td>{{r.price}}</td>
+        <td> ${{r.price}}</td>
         <td>{{r.description}}</td>
         <td>
-            <nav style="margin-bottom:25 ;margin-left:auto">
-              <a class="btn btn-primary" href = "/shopping_cart" >Add to Cart </a>
-               </nav>
+          
+          <form method = "GET" action = "/add-to-cart">
+            <input type = "hidden" name = "code" value = "{{r.productnumber}}"/>
+            <input type="text" class="product-quantity" name="quantity" value="1" size="2" />
+            <input type = "submit" value = "Add to Cart" name ="productNumber" class = "btn btn-lg btn-primary btn-block"/>
+    
+          </form>
+            <!--<nav style="margin-bottom:25 ;margin-left:auto">
+              <input type="submit" value="Add to Cart" class="default-btn" href = '/shopping-cart'/>
+               </nav> -->
              </td>
       </tr>
       {% endfor %}

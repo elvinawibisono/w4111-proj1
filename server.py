@@ -266,13 +266,45 @@ def another():
   return render_template("another.html")
 
 
-@app.route('/shopping-cart',methods = ['POST'])
-
+@app.route('/shopping-cart')
 def shopping_cart():
- 
-  productName = request.form['name']
 
   return render_template("shopping_cart.html")
+
+
+
+@app.route('/add-to-cart', methods = ["GET", "POST"])
+def add_to_cart():
+  productNumber = request.args.get("code")
+  quantity = request.args.get("quantity")
+  print(quantity)
+
+  result = g.conn.execute("SELECT * FROM product p  WHERE p.productnumber = %s", productNumber)
+
+  #itemArray = {result['productNumber'] : {'name' : result['name'], 'productNumber' : result['productNumber'], 'price' : result['price'], 'image' : row['imageurl']}}
+
+  return render_template("shopping_cart.html", result=result)
+
+@app.route('/payment-confirmation')
+def payment():
+  
+  return render_template("payment_conf.html")
+
+@app.route('/add-payment',methods = ['POST'])
+def add_payment(): 
+  getpaymentId = g.conn.execute('SELECT paymentid FROM payment ORDER BY payment DESC LIMIT 1')
+  print(getpaymentId)
+  addpaymentid = int(getpaymentId) + 1
+  paymentid = str(addpaymentid)
+  cardName= request.form['cardName']
+  cardNumber = request.form['cardNumber']
+  cvvNumber = request.form['cvvNumber']
+  zipCode = request.form['zipCode']
+  expDate = request.form['expDate']
+  print(expDate)
+  g.conn.execute('INSERT INTO Payment (paymentId, cardName, cardNumber , cvvNumber, zipCode, expDate) VALUES (%s, %s, %s, %s, %s,%s)', paymentid, cardName, cardNumber, cvvNumber, zipCode,expDate)
+  return redirect("index.html")
+
 
 @app.route('/products')
 def products():
