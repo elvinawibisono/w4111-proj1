@@ -4,11 +4,14 @@ Columbia's COMS W4111.001 Introduction to Databases
 Example Webserver
 To run locally:
     python3 server.py
-Go to http://localhost:8111 in your browser.
+Go to http://localhost:8111 in your bresultser.
 A debugger such as "pdb" may be helpful for debugging.
 Read about it online.
 """
 import os
+from random import randint
+import datetime
+from datetime import date
   # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
@@ -53,7 +56,7 @@ engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'
 def before_request():
   """
   This function is run at the beginning of every web request
-  (every time you enter an address in the web browser).
+  (every time you enter an address in the web bresultser).
   We use it to setup a database connection that can be used throughout the request.
 
   The variable g is globally accessible.
@@ -96,7 +99,7 @@ def index():
   request is a special object that Flask provides to access web request information:
 
   request.method:   "GET" or "POST"
-  request.form:     if the browser submitted a form, this contains the data in the form
+  request.form:     if the bresultser submitted a form, this contains the data in the form
   request.args:     dictionary of URL arguments, e.g., {a:1, b:2} for http://localhost?a=1&b=2
 
   See its API: https://flask.palletsprojects.com/en/2.0.x/api/?highlight=incoming%20request%20data
@@ -188,7 +191,7 @@ def search_item():
     flash('Please enter a value!')
     return render_template('index.html')
 
-  cursor = g.conn.execute('SELECT p.name, p.price, p.description, p.imageurl, c.categoryname FROM Product p, Categories c WHERE p.name ILIKE %s or p.description ILIKE %s or c.categoryname ILIKE %s', word, word, word)
+  cursor = g.conn.execute('SELECT p.productnumber, p.name, p.price, p.description, p.imageurl, c.categoryname FROM Product p, Categories c WHERE p.name ILIKE %s or p.description ILIKE %s or c.categoryname ILIKE %s', word, word, word)
 
   word_dict = {}
   for result in cursor:
@@ -271,40 +274,49 @@ def shopping_cart():
 
   return render_template("shopping_cart.html")
 
-
-
 @app.route('/add-to-cart', methods = ["GET", "POST"])
 def add_to_cart():
   productNumber = request.args.get("code")
   quantity = request.args.get("quantity")
-  print(quantity)
-
+  price  = request.args.get("price")
+  name = request.args.get("name")
+  total = float(quantity)* float(price)
   result = g.conn.execute("SELECT * FROM product p  WHERE p.productnumber = %s", productNumber)
+  g.conn.execute("INSERT INTO shopping_cart(productName, quantity, totalPrice, productNumber)VALUES(%s, %s, %s,%s)", name, quantity,total, productNumber)
 
-  #itemArray = {result['productNumber'] : {'name' : result['name'], 'productNumber' : result['productNumber'], 'price' : result['price'], 'image' : row['imageurl']}}
-
-  return render_template("shopping_cart.html", result=result)
+  return render_template("shopping_cart.html", result=result, quantity = quantity, total = total)
 
 @app.route('/payment-confirmation')
 def payment():
-  
+
   return render_template("payment_conf.html")
 
 @app.route('/add-payment',methods = ['POST'])
 def add_payment(): 
-  getpaymentId = g.conn.execute('SELECT paymentid FROM payment ORDER BY payment DESC LIMIT 1')
-  print(getpaymentId)
-  addpaymentid = int(getpaymentId) + 1
-  paymentid = str(addpaymentid)
   cardName= request.form['cardName']
   cardNumber = request.form['cardNumber']
   cvvNumber = request.form['cvvNumber']
   zipCode = request.form['zipCode']
   expDate = request.form['expDate']
   print(expDate)
-  g.conn.execute('INSERT INTO Payment (paymentId, cardName, cardNumber , cvvNumber, zipCode, expDate) VALUES (%s, %s, %s, %s, %s,%s)', paymentid, cardName, cardNumber, cvvNumber, zipCode,expDate)
-  return redirect("index.html")
+  g.conn.execute('INSERT INTO Payment (cardName, cardNumber , cvvNumber, zipCode, expDate) VALUES (%s, %s, %s, %s,%s)', cardName, cardNumber, cvvNumber, zipCode,expDate)
+  return redirect("/order-confirmation")
 
+def randnum(n):
+  min = 10**(n-1)
+  max = (10**n)-1
+  return randint(min,max)
+
+
+@app.route('/order-confirmation')
+def order_conf():
+  trackingNumber = randnum(20)
+  today = date.today()
+  orderdate = today.strftime("%Y-%m-%d")
+  getdeliverydate = datetime.datetime.today() + datetime.timedelta(days=7)
+  deliverydate = getdeliverydate.strftime("%Y-%m-%d")
+  g.conn.execute('INSERT INTO order_confirmation(orderdate, deliverydate, trackingnumber) VALUES (%s, %s, %s)', orderdate, deliverydate, trackingNumber)
+  return render_template("order_conf.html", trackingNumber=trackingNumber, orderdate=orderdate, deliverydate = deliverydate)
 
 @app.route('/products')
 def products():
@@ -315,7 +327,6 @@ def products():
 def signup():
   return render_template("sign_up.html")
 
-
 @app.route('/add-customer',methods = ['POST'])
 def addcustomer(): 
   name = request.form['name']
@@ -323,7 +334,7 @@ def addcustomer():
   school = request.form['school']
   imgurl = request.form['img_url']
   address = request.form['address']
-  g.conn.execute('INSERT INTO Customer ("name", "email", school, address, iconimagurl) VALUES (%s, %s, %s, %s)', name, email, school, address,imgurl)
+  #g.conn.execute('INSERT INTO Customer ("name", "email", school, address, iconimagurl) VALUES (%s, %s, %s, %s)', name, email, school, address,imgurl)
   return redirect("index.html")
 
 @app.route('/sign-in', methods =['GET', 'POST'])
@@ -340,8 +351,6 @@ def add():
   name = request.form['name']
   g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   return redirect('/')
-
-
 
 @app.route('/login')
 def login():
