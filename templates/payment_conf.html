@@ -36,19 +36,19 @@
         </div>
         <div class="form-group">
           <label for="cardNumber"> Card Number</label>
-            <textarea class="form-control" id="cardNumber" name="cardNumber" maxlength = "16" placeholder="Enter your card number here.." required></textarea>
+            <textarea class="form-control" id="cardNumber" name="cardNumber" minlength = "16" maxlength = "16" placeholder="Enter your card number here.." required></textarea>
         </div>
         <div class="form-group">
           <label for="cvvNumber">CVV Number</label>
-          <input type="text" id="cvvNumber" name="cvvNumber" class="form-control" maxlength = "4" placeholder="Enter your cvv number" required autofocus>
+          <input type="text" id="cvvNumber" name="cvvNumber" class="form-control" minlength = "3" maxlength = "4" placeholder="Enter your cvv number" required autofocus>
         </div>
         <div class="form-group">
           <label for="zipCode">zipCode</label>
-          <input type="text" id="zipCode" name="zipCode" class="form-control" maxlength = "5" placeholder="Enter your name here.." required autofocus>
+          <input type="text" id="zipCode" name="zipCode" class="form-control" minlength = "5" maxlength = "5" placeholder="Enter your name here.." required autofocus>
         </div>
         <div class="form-group">
           <label for="expDate">expDate</label>
-          <input type="text" id="expDate" name="expDate" class="form-control" placeholder="Enter by MM/DD/YYY.." required autofocus>
+          <input type="date" id="expDate" name="expDate" class="form-control" placeholder="Enter by MM/DD/YYY.." required autofocus>
         </div>
 
 
